@@ -1,0 +1,24 @@
+{
+  "name": "new_server",
+  "version": "1.0.0",
+  "description": "- Class:\r     - type(CLASSTYPE: enum): 限定的課程名稱\r     - homeworks([Homework]): 作業的清單\r - Homework\r     - id(Int): 哪項作業(1, 2, 3...)\r     - finished_people(Int): 總共幾個人完成\r     - total_time(Int): 總時間長(分鐘為單位)\r - CLASSTYPE 課程名稱\r     - Computer_Architecture\r     - Probability\r     - Software_Studio",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoftwareStudio2022G4/New_Server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SoftwareStudio2022G4/New_Server/issues"
+  },
+  "homepage": "https://github.com/SoftwareStudio2022G4/New_Server#readme",
+  "dependencies": {
+    "apollo-server": "^3.8.2",
+    "graphql": "^16.5.0"
+  }
+}
