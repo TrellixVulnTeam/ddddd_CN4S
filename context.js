@@ -1,7 +1,7 @@
-const clap = require('./db.json');
+const models = require('./models');
 
 const context = {
-    clap,
+    models,
 };
 
 module.exports = context;

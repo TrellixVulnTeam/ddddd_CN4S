@@ -19,6 +19,9 @@
   "homepage": "https://github.com/SoftwareStudio2022G4/New_Server#readme",
   "dependencies": {
     "apollo-server": "^3.8.2",
-    "graphql": "^16.5.0"
+    "graphql": "^16.5.0",
+    "sequelize": "^6.20.1",
+    "sequelize-cli": "^6.4.1",
+    "sqlite3": "^5.0.8"
   }
 }

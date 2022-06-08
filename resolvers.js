@@ -1,16 +1,10 @@
 const resolvers = {
-    Class: {
+    Homework: {
         type(parent) {
             return parent.type;
         },
-        homeworks(parent, __, context) {
-            return context.clap.find(item => item.type === parent.type).homeworks;
-        },
-    },
-
-    Homework: {
-        id(parent) {
-            return parent.id;
+        index(parent) {
+            return parent.index;
         },
         finished_people(parent) {
             return parent.finished_people;
@@ -21,14 +15,14 @@ const resolvers = {
     },
 
     Query: {
-        classes(_, __, context) {
-            return context.clap;
+        async get_all_homework(_, __, {models}) {
+            return await models.Homework.findAll();
         },
-        class_detail(_, args, context) {
-            return context.clap.find(item => item.type === args.type);
+        async class_detail(_, args, {models}) {
+            return await models.Homework.findAll({where: {type: args.type}});
         },
-        get_homework(_, args, context) {
-            return context.clap.find(item => item.type === args.type).homeworks.find(item => item.id === args.id);
+        async get_homework(_, args, {models}) {
+            return await models.Homework.findOne({where: {type: args.type, index: args.index}});
         },
         get_classes(_, __, ___, info) {
             const ret = [];
@@ -40,67 +34,28 @@ const resolvers = {
     },
 
     Mutation: {
-        add_class(_, args, context) {
-            const newClass = {
-                type: args.type,
-                homeworks: [],
-            };
-            if(!context.clap.find(item => item.type === args.type)) {
-                context.clap.push(newClass);
-            }
-            return context.clap;
+        async create_homework(_, args, {models}) {
+            const homework = await models.Homework.findOne({where: {type: args.type, index: args.index}});
+            if(homework === null) await models.Homework.create({type: args.type, index: args.index, finished_people: 0, total_time: 0});
+            return await models.Homework.findAll({where: {type: args.type}});
         },
-        delete_class(_, args, context) {
-            const index = context.clap.findIndex(item => item.type === args.type);
-            if(index !== -1) {
-                context.clap.splice(index, 1);
-            }
-            return context.clap;
+        async addto_homework(_, args, {models}) {
+            const cur = await models.Homework.findOne({where: {type: args.type, index: args.index}});
+            if(cur === null) return null;
+            cur.finished_people += (args.finished_people ? args.finished_people : 0);
+            cur.total_time += (args.total_time ? args.total_time : 0);
+            await cur.save();
+            return cur;
         },
-        create_homework(_, args, context) {
-            const index = context.clap.findIndex(item => item.type === args.type);
-            if(index === -1) return null;
-            const newHomework = {
-                id: args.id,
-                finished_people: 0,
-                total_time: 0,
-            };
-            if(!context.clap[index].homeworks.find(item => item.id === args.id)) {
-                context.clap[index].homeworks.push(newHomework);
-            }
-            return context.clap[index];
+        async edit_homework(_, args, {models}) {
+            const cur = await models.Homework.findOne({where: {type: args.type, index: args.index}});
+            if(cur === null) return null;
+            await models.Homework.update({finished_people: args.finished_people, total_time: args.total_time}, {where: {type: args.type, index: args.index}});
+            return await models.Homework.findOne({where: {type: args.type, index: args.index}});
         },
-        addto_homework(_, args, context) {
-            const { type, id, finished_people, total_time } = args;
-            const which = context.clap.findIndex(item => item.type === type);
-            if(which === -1) return null;
-            const index = context.clap[which].homeworks.findIndex(item => item.id === id);
-            if(context.clap[which].homeworks[index]) {
-                context.clap[which].homeworks[index].finished_people += (finished_people || 0);
-                context.clap[which].homeworks[index].total_time += (total_time || 0);
-            }
-            return context.clap[which].homeworks[index];
-        },
-        edit_homework(_, args, context) {
-            const { type, id, finished_people, total_time } = args;
-            const which = context.clap.findIndex(item => item.type === type);
-            if(which === -1) return null;
-            const index = context.clap[which].homeworks.findIndex(item => item.id === id);
-            if(context.clap[which].homeworks[index]) {
-                context.clap[which].homeworks[index].finished_people = finished_people;
-                context.clap[which].homeworks[index].total_time = total_time;
-            }
-            return context.clap[which].homeworks[index];
-        },
-        delete_homework(_, args, context) {
-            const { type, id } = args;
-            const which = context.clap.findIndex(item => item.type === type);
-            if(which === -1) return null;
-            const index = context.clap[which].homeworks.findIndex(item => item.id === id);
-            if(index !== -1) {
-                context.clap[which].homeworks.splice(index, 1);
-            }
-            return context.clap[which];
+        async delete_homework(_, args, {models}) {
+            await models.Homework.destroy({where: {type: args.type, index: args.index}});
+            return (await models.Homework.findAll({where: {type: args.type}}));
         },
     }
 };
